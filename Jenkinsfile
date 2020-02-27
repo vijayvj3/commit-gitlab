@@ -1,58 +1,60 @@
-import groovy.json.*
-import groovy.json.JsonSlurper 
-//int ids1;
-
-def call(jsondata){
-      def jsonString = jsondata
-      def jsonObj = readJSON text: jsonString
-      String a=jsonObj.scm.projects.project.project_name
-String Name=a.replaceAll("\\[", "").replaceAll("\\]","");
-     withCredentials([usernamePassword(credentialsId: 'gitlab_cred', passwordVariable: 'password', usernameVariable:'username')]) {
-      sh "curl -X GET    -u $username:$password https://gitlab.com/api/v4/users/5418155/projects -o output.json"
-     }
-   def jsonSlurper = new JsonSlurper()
- def reader = new BufferedReader(new InputStreamReader(new FileInputStream("/var/lib/jenkins/workspace/${JOB_NAME}/output.json"),"UTF-8"))
-def resultJson = jsonSlurper.parse(reader)
-def usertotal = resultJson.size()
-      println(usertotal)
-      println(Name)
-      for(i=0;i<usertotal;i++)
-         {
-            if(Name==resultJson[i].name)
+@Library('shlib1')_
+pipeline
+{
+    agent any
+stages{
+/* stage('commits')
+        {
+            steps{
+             commits()
+            // influx()
+                 }
+         }
+        stage('contributors')
+        {
+            steps{
+             contributors()
+            // influx()
+                 }
+         }
+     stage('issues')
+        {
+            steps{
+             gitlab_issue()
+            // influx()
+                 }
+         }
+     stage('mergerequest')
+        {
+            steps{
+             gitlab_mergerequest()
+            // influx()
+                 }
+         }*/
+    
+    
+     /*stage('merge_req'){
+        steps{
+        
+            script
             {
-               def id1 = resultJson[i].id 
-               println(id1)
-             return id1
+            def ids= merge_gitlab(jsondata)
+         println(ids)
+         merge_gitlab.commit(ids)
             }
-         }
-         }
-def commit(ids1,jsondata){
-	def jsonString = jsondata
-def jsonObj = readJSON text: jsonString
-      println(ids1)
-	int ecount = jsonObj.config.emails.email.size()
-         println("No of users "+ ecount)
-      withCredentials([usernamePassword(credentialsId: 'gitlab_cred', passwordVariable: 'password', usernameVariable:'username')]) {
-	      sh "curl -X GET   -u $username:$password https://gitlab.com/api/v4/projects/${ids1}/repository/commits -o output.json"
-      }
-   def jsonSlurper = new JsonSlurper()
-   def reader = new BufferedReader(new InputStreamReader(new FileInputStream("/var/lib/jenkins/workspace/${JOB_NAME}/output.json"),"UTF-8"))
-def resultJson = jsonSlurper.parse(reader)
-def total = resultJson.size()
-   println(total)
-      //println(JsonOutput.toJson(resultJson))
-      List<String> JSON = new ArrayList<String>();
+        }
+     }*/
+stage('merge_req'){
+        steps{
+        
+            script
+            {
+            def ids= commits_gitlabb(jsondata)
+         println(ids)
+     commits_gitlabb.commit(ids,jsondata)
+            }
+        }
+     }
 
-for(i=0;i<ecount;i++)
- {
-  for(j=1;j<total;j++)
-  {
-   if(jsonObj.config.emails.email[i]==resultJson[j].author_email)
-   {
-	   JSON.add(JsonOutput.toJson(resultJson[j]))
-     }
-     }
-     }
-     println(JSON)
-     
+}
 }
