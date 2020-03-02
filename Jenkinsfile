@@ -38,9 +38,9 @@ stages{
         
             script
             {
-            def ids=  merge_request_gitlab(jsondata)
+            def ids=  Merge_request_gitlab(jsondata)
          println(ids)
-          merge_request_gitlab.commit(ids)
+          Merge_request_gitlab.commit(ids)
             }
         }
      }
